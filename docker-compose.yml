@@ -1,55 +1,21 @@
-# DebateCoach Pro - Local Development Docker Compose
-# Usage: docker-compose up --build
-
 version: '3.8'
 
 services:
-  # Backend FastAPI Service
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: debatecoach-backend
-    ports:
-      - "8080:8080"
+  solaire:
+    build: .
+    container_name: solaire
+    restart: unless-stopped
     environment:
-      - PORT=8080
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - LOG_LEVEL=INFO
-      - DEBUG=true
+      - NODE_ENV=production
+      - SOLAIRE_HOME=/data
     volumes:
-      - ./backend:/app
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-
-  # Frontend React Service
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: debatecoach-frontend
+      - ./data:/data
+      - ./logs:/app/logs
     ports:
-      - "3000:8080"
-    environment:
-      - VITE_BACKEND_URL=http://localhost:8080
-    depends_on:
-      - backend
-    restart: unless-stopped
+      - "7777:7777"
+    networks:
+      - solaire-network
 
-  # Optional: Redis for session management (future scaling)
-  # redis:
-  #   image: redis:7-alpine
-  #   container_name: debatecoach-redis
-  #   ports:
-  #     - "6379:6379"
-  #   volumes:
-  #     - redis_data:/data
-  #   restart: unless-stopped
-
-# volumes:
-#   redis_data:
+networks:
+  solaire-network:
+    driver: bridge

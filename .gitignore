@@ -45,3 +45,9 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Solaire specific ignores
+node_modules/
+dist/
+build/
+.env
